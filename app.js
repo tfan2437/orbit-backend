@@ -5,7 +5,7 @@ import { PORT } from "./config/env.js";
 import connectToDatabase from "./database/mongodb.js";
 
 import userRouter from "./routes/user.route.js";
-import testRouter from "./routes/test.route.js";
+import chatRouter from "./routes/chat.route.js";
 const app = express();
 
 // Enable CORS for all routes
@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRouter);
-app.use("/api/tests", testRouter);
+app.use("/api/chats", chatRouter);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

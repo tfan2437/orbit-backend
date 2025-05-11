@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const User = mongoose.model("User", userSchema);

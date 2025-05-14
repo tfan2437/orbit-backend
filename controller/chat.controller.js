@@ -7,7 +7,11 @@ export const getChats = async (req, res) => {
     if (!uid) {
       return res.status(400).json({
         success: false,
-        message: "User ID is required",
+        chats: {
+          today: [],
+          yesterday: [],
+          previous: [],
+        },
       });
     }
 
@@ -15,19 +19,65 @@ export const getChats = async (req, res) => {
     if (!chats) {
       return res.status(404).json({
         success: false,
-        message: "Chats not found",
+        chats: {
+          today: [],
+          yesterday: [],
+          previous: [],
+        },
       });
     }
 
+    const formatedChats = chats.map((chat) => {
+      return {
+        chat_id: chat.chat_id,
+        title: chat.title,
+        updatedAt: chat.updatedAt,
+      };
+    });
+
+    console.log(formatedChats);
+
+    // Get today's date at 00:00:00
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Get yesterday's date at 00:00:00
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Categorize chats based on their updatedAt timestamp
+    const todayChats = formatedChats.filter((chat) => {
+      const chatDate = new Date(chat.updatedAt);
+      return chatDate >= today;
+    });
+
+    const yesterdayChats = formatedChats.filter((chat) => {
+      const chatDate = new Date(chat.updatedAt);
+      return chatDate >= yesterday && chatDate < today;
+    });
+
+    const previousChats = formatedChats.filter((chat) => {
+      const chatDate = new Date(chat.updatedAt);
+      return chatDate < yesterday;
+    });
+
     res.status(200).json({
       success: true,
-      chats: chats,
+      chats: {
+        today: todayChats,
+        yesterday: yesterdayChats,
+        previous: previousChats,
+      },
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Server error while getting chats",
-      error: error.message,
+      chats: {
+        today: [],
+        yesterday: [],
+        previous: [],
+      },
     });
   }
 };

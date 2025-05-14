@@ -6,6 +6,8 @@ import connectToDatabase from "./database/mongodb.js";
 
 import userRouter from "./routes/user.route.js";
 import chatRouter from "./routes/chat.route.js";
+import { verifyToken } from "./middleware/auth.middleware.js";
+
 const app = express();
 
 // Enable CORS for all routes
@@ -16,6 +18,15 @@ app.use("/api/users", userRouter);
 app.use("/api/chats", chatRouter);
 app.get("/", (req, res) => {
   res.send("Hello World!");
+});
+
+// Protected route - requires authentication
+app.get("/api/firebase", verifyToken, (req, res) => {
+  // req.user contains the decoded token information
+  res.json({
+    message: "This is a protected endpoint",
+    user: req.user,
+  });
 });
 
 app.listen(PORT, async () => {

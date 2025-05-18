@@ -1,9 +1,5 @@
-import { PHOTO_URL } from "../config/env.js";
 import User from "../models/user.model.js";
 
-/**
- * Create a new user
- */
 export const createUser = async (req, res) => {
   try {
     const { uid, email, name, photo_url, subscription_tier, last_login } =
@@ -34,7 +30,7 @@ export const createUser = async (req, res) => {
       uid,
       email,
       name,
-      photo_url: photo_url || PHOTO_URL,
+      photo_url: photo_url || "",
       subscription_tier: subscription_tier || "free",
       last_login: last_login || new Date(),
     };
@@ -67,9 +63,6 @@ export const createUser = async (req, res) => {
   }
 };
 
-/**
- * Get user by UID
- */
 export const getUser = async (req, res) => {
   try {
     const { uid } = req.params;

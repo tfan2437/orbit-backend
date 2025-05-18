@@ -46,20 +46,26 @@ export const getChats = async (req, res) => {
     yesterday.setDate(yesterday.getDate() - 1);
 
     // Categorize chats based on their updatedAt timestamp
-    const todayChats = formatedChats.filter((chat) => {
-      const chatDate = new Date(chat.updatedAt);
-      return chatDate >= today;
-    });
+    const todayChats = formatedChats
+      .filter((chat) => {
+        const chatDate = new Date(chat.updatedAt);
+        return chatDate >= today;
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-    const yesterdayChats = formatedChats.filter((chat) => {
-      const chatDate = new Date(chat.updatedAt);
-      return chatDate >= yesterday && chatDate < today;
-    });
+    const yesterdayChats = formatedChats
+      .filter((chat) => {
+        const chatDate = new Date(chat.updatedAt);
+        return chatDate >= yesterday && chatDate < today;
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-    const previousChats = formatedChats.filter((chat) => {
-      const chatDate = new Date(chat.updatedAt);
-      return chatDate < yesterday;
-    });
+    const previousChats = formatedChats
+      .filter((chat) => {
+        const chatDate = new Date(chat.updatedAt);
+        return chatDate < yesterday;
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     res.status(200).json({
       success: true,
@@ -172,12 +178,45 @@ export const getChat = async (req, res) => {
   }
 };
 
+export const deleteChat = async (req, res) => {
+  try {
+    const { chat_id } = req.params;
+
+    if (!chat_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Chat ID is required",
+      });
+    }
+
+    const chat = await Chat.findOne({ chat_id });
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat not found",
+      });
+    }
+
+    await Chat.deleteOne({ chat_id });
+    res.status(200).json({
+      success: true,
+      message: "Chat deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting chat",
+    });
+  }
+};
+
 export const updateChat = async (req, res) => {
   try {
     const { chat_id } = req.params;
     const { uid, title, contents } = req.body;
 
-    if (!chat_id || !contents || !uid || !title) {
+    if (!chat_id || !uid || (!title && !contents)) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -192,7 +231,13 @@ export const updateChat = async (req, res) => {
       });
     }
 
-    chat.contents.push(...contents);
+    if (title !== "") {
+      chat.title = title;
+    }
+
+    if (contents.length > 0) {
+      chat.contents.push(...contents);
+    }
 
     await chat.save();
 

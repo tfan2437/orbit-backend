@@ -14,19 +14,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", userRouter);
-app.use("/api/chats", chatRouter);
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/api/users", verifyToken, userRouter);
+app.use("/api/chats", verifyToken, chatRouter);
 
-// Protected route - requires authentication
-app.get("/api/firebase", verifyToken, (req, res) => {
-  // req.user contains the decoded token information
-  res.json({
-    message: "This is a protected endpoint",
-    user: req.user,
-  });
+app.get("/", (req, res) => {
+  res.send("Orbit AI");
 });
 
 app.listen(PORT, async () => {

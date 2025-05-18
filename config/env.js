@@ -1,12 +1,13 @@
 import { config } from "dotenv";
 
-const env = ".env";
+const env = `.env.${process.env.NODE_ENV || "development"}.local`;
 
 config({ path: env });
 
 export const {
   PORT,
   MONGODB_URI,
+  NODE_ENV,
   FIREBASE_PROJECT_ID,
   FIREBASE_PRIVATE_KEY_ID,
   FIREBASE_PRIVATE_KEY,

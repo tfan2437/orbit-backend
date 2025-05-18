@@ -21,11 +21,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/users", verifyToken, userRouter);
-app.use("/api/chats", verifyToken, chatRouter);
+app.use("/api/users", userRouter);
+app.use("/api/chats", chatRouter);
 
 app.get("/", (req, res) => {
-  res.send("Orbit AI");
+  res.send("Orbit AI Deployed Server");
 });
 
 // Error handling middleware
